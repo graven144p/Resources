@@ -1,0 +1,40 @@
+https://blog.ch4n3.kr/497
+
+Exploit point #1
+
+ In this problem, both the grammatical elements of the query must be satisfied. We completed the SQL grammatical condition of this problem using comments.
+
+
+
+query : select id from prob_alien where no='#'#' \nunion select 0x61646D696E#
+
+query2 : select id from prob_alien where no=''#'#' \nunion select 0x61646D696E#'
+
+
+
+ In the query after the comment, it can be bypassed as above by using the fact that the newline character (\n) can be used to escape.
+
+
+Exploit point #2
+
+
+
+
+
+Looking at this part, it doesn't seem logical, but if you use a function that can return the result value differently depending on the event, such as timestamp or random, $r['id'] changes every time the mysqli_query() function is executed. Conditions can be satisfied.
+
+
+
+query : select id from prob_alien where no='#'#'\n
+union select sleep(1/2) union select now()%2 union select 0x61646D696E limit 2,1#
+
+query2 : select id from prob_alien where no=''#'#'\n
+union select sleep(1/2) union select now()%2 union select 0x61646D696E limit 2,1#'
+
+
+
+ When the return value of now()%2 is 0 using UNION Clause, only 2 rows are returned because the value is the same as sleep(1/2), so no value is returned by LIMIT 2,1. When the return value of now()%2 is 1, since the value is not the same as sleep(1/2), 3 rows are changed, but only'admin' is returned by LIMIT 2,1. Solved using this point.
+
+
+
+ Originally, I was trying to use sleep(1), but I was wondering that it wasn't solved strangely, but now that I think about it, because there are 2 rows in prob_alien, sleep(1) is executed twice and sleeps for a total of 2 seconds. It didn't work because it didn't fit. So I used sleep(1/2).

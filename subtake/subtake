@@ -1,0 +1,31 @@
+#!/bin/bash
+
+
+print_usage() {
+  printf "Take as input on stdin a list of urls and print on stdout CNAME records found with dig.\n\tcat urls | subtake\n"
+  exit 0
+}
+
+while getopts 'h' flag; do
+  case "${flag}" in
+    h) print_usage ;;
+    *) print_usage
+       exit 1 ;;
+  esac
+done
+
+
+RED='\033[0;31m' # Red
+NC='\033[0m' # No Color
+
+# Read line on stdin
+while read line
+do
+    output=$( dig "$line" | grep CNAME )
+    # if output is not empty
+    if [ ! -z "$output" ]
+    # print the CNAME record from dig
+    then echo -e "${RED}$line${NC}"; dig "$line" | grep CNAME; echo ""
+    echo "---------------------------"
+    fi
+done

