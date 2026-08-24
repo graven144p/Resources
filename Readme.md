@@ -33,6 +33,7 @@ The topics include:
 ----------
 
 ### Network Pentesting
+- [Darkmoon](https://github.com/ASCIT31/Dark-Moon) - Open source (GPLv3) autonomous penetration testing platform. 50 specialist agents over MCP, 80+ offensive tools, proof of exploitation on every finding, runs locally.
 - [Wireshark Essentilals](https://github.com/cyberh3x/books/blob/master/9781783554638-WIRESHARK_ESSENTIALS.pdf)
 - [Mastering Wireshark](https://github.com/cyberh3x/books/blob/master/9781783989522-MASTERING_WIRESHARK.pdf)
 
